@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="Archeion_App.Pages.HomePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <ScrollViewer Padding="24,16,24,24">
+        <StackPanel Spacing="20" MaxWidth="900" HorizontalAlignment="Left">
+            <StackPanel Spacing="4">
+                <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="ARCHEION Overview" FontWeight="SemiBold" />
+                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           Text="Free, private, offline-first personal Android backup, preservation, and recovery system." />
+            </StackPanel>
+
+            <!-- Repository Card -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1" CornerRadius="8" Padding="16">
+                <StackPanel Spacing="8">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE8B7;" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+                        <TextBlock Text="Repository State" FontWeight="SemiBold" Style="{StaticResource SubtitleTextBlockStyle}" />
+                    </StackPanel>
+                    <TextBlock x:Name="TxtRepoStatus" Text="Initializing repository..." Style="{StaticResource BodyTextBlockStyle}" />
+                    <TextBlock x:Name="TxtStats" Text="0 Snapshots | 0 Bytes Stored" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Devices Card -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1" CornerRadius="8" Padding="16">
+                <StackPanel Spacing="8">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE8EA;" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+                        <TextBlock Text="Connected Devices" FontWeight="SemiBold" Style="{StaticResource SubtitleTextBlockStyle}" />
+                    </StackPanel>
+                    <TextBlock x:Name="TxtDeviceSummary" Text="No active device selected" Style="{StaticResource BodyTextBlockStyle}" />
+                    <TextBlock Text="Connect your Android device via USB (ADB) or launch the ARCHEION Companion app on Wi-Fi."
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Quick Actions -->
+            <TextBlock Text="Quick Actions" FontWeight="SemiBold" Style="{StaticResource SubtitleTextBlockStyle}" />
+            <Grid ColumnSpacing="12" RowSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Button x:Name="BtnRefresh" Content="Refresh Overview" Click="BtnRefresh_Click" HorizontalAlignment="Stretch" />
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

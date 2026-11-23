@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="Archeion_App.Pages.RestorePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <ScrollViewer Padding="24,16,24,24">
+        <StackPanel Spacing="20" MaxWidth="900" HorizontalAlignment="Left">
+            <StackPanel Spacing="4">
+                <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Restore &amp; Migration" FontWeight="SemiBold" />
+                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           Text="Conflict-aware selective restore with cryptographic verification and safeguards against accidental overwrite." />
+            </StackPanel>
+
+            <TextBlock Text="Conflict Resolution Strategy" Style="{StaticResource SubtitleTextBlockStyle}" FontWeight="SemiBold" />
+            <RadioButtons x:Name="RbConflictAction" SelectedIndex="0">
+                <RadioButton Content="Rename conflict (keep both files safe)" />
+                <RadioButton Content="Skip conflict (do not overwrite existing)" />
+                <RadioButton Content="Replace conflict (overwrite destination)" />
+            </RadioButtons>
+
+            <TextBlock x:Name="TxtStatus" Text="Select a snapshot to begin restoration." Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+
+            <ListView x:Name="ListPlannedItems" Height="300"
+                      BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" CornerRadius="8">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Padding="8" ColumnSpacing="16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="120" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding TargetPath}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1" Text="{Binding Action}" VerticalAlignment="Center" FontWeight="SemiBold" />
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

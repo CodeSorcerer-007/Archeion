@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="Archeion_App.Pages.BackupPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <ScrollViewer Padding="24,16,24,24">
+        <StackPanel Spacing="20" MaxWidth="800" HorizontalAlignment="Left">
+            <StackPanel Spacing="4">
+                <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Backup Studio" FontWeight="SemiBold" />
+                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           Text="Create atomic, encrypted snapshot backups with streaming SHA-256 chunk deduplication." />
+            </StackPanel>
+
+            <TextBlock Text="Categories to Preserve" Style="{StaticResource SubtitleTextBlockStyle}" FontWeight="SemiBold" />
+            <StackPanel Spacing="8">
+                <CheckBox x:Name="ChkPhotos" Content="Photos &amp; Camera Roll (DCIM)" IsChecked="True" />
+                <CheckBox x:Name="ChkVideos" Content="Movies &amp; Recorded Video Clips" IsChecked="True" />
+                <CheckBox x:Name="ChkAudio" Content="Audio &amp; Music Files" IsChecked="True" />
+                <CheckBox x:Name="ChkContacts" Content="Contacts (Standard vCard VCF)" IsChecked="True" />
+                <CheckBox x:Name="ChkCalendar" Content="Calendar Events (Standard iCalendar ICS)" IsChecked="True" />
+                <CheckBox x:Name="ChkApps" Content="App Inventory &amp; Base APKs" IsChecked="True" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="12">
+                <Button x:Name="BtnStartBackup" Content="Start Backup Session" Click="BtnStartBackup_Click" Style="{StaticResource AccentButtonStyle}" />
+                <Button x:Name="BtnCancel" Content="Cancel" Click="BtnCancel_Click" />
+            </StackPanel>
+
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1" CornerRadius="8" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Live Session Progress" FontWeight="SemiBold" />
+                    <ProgressBar x:Name="BackupProgressBar" Minimum="0" Maximum="100" Value="0" HorizontalAlignment="Stretch" />
+                    <TextBlock x:Name="TxtStage" Text="Stage: Idle" Style="{StaticResource BodyTextBlockStyle}" />
+                    <TextBlock x:Name="TxtCurrentItem" Text="" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+                    <TextBlock x:Name="TxtStatus" Text="Ready to begin backup." Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

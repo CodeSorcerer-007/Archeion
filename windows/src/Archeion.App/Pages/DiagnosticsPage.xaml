@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="Archeion_App.Pages.DiagnosticsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <ScrollViewer Padding="24,16,24,24">
+        <StackPanel Spacing="20" MaxWidth="900" HorizontalAlignment="Left">
+            <StackPanel Spacing="4">
+                <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Activity &amp; Diagnostics" FontWeight="SemiBold" />
+                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           Text="Cryptographic repository health checks, staging hygiene, and integrity audit logs." />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="12">
+                <Button x:Name="BtnRunScan" Content="Run Full Integrity Scan" Click="BtnRunScan_Click" Style="{StaticResource AccentButtonStyle}" />
+                <Button x:Name="BtnCleanupStaging" Content="Clean Orphan Staging" Click="BtnCleanupStaging_Click" />
+            </StackPanel>
+
+            <TextBlock x:Name="TxtStatus" Text="Ready to scan." Style="{StaticResource BodyTextBlockStyle}" />
+
+            <TextBlock Text="Discrepancy / Integrity Log" Style="{StaticResource SubtitleTextBlockStyle}" FontWeight="SemiBold" />
+            <ListView x:Name="ListDiscrepancies" Height="300"
+                      BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" CornerRadius="8">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" Padding="8" Foreground="{ThemeResource SystemFillColorCriticalBrush}" />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

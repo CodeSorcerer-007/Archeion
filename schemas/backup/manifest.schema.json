@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ArcheionSnapshotManifest",
+  "type": "object",
+  "properties": {
+    "schemaVersion": { "type": "string" },
+    "snapshotId": { "type": "string", "format": "uuid" },
+    "deviceId": { "type": "string", "format": "uuid" },
+    "repositoryId": { "type": "string", "format": "uuid" },
+    "parentSnapshotId": { "type": ["string", "null"], "format": "uuid" },
+    "createdAtUtc": { "type": "string", "format": "date-time" },
+    "state": { "type": "string", "enum": ["InProgress", "Completed", "Partial", "Failed"] },
+    "totalBytes": { "type": "integer", "minimum": 0 },
+    "totalItems": { "type": "integer", "minimum": 0 },
+    "categories": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "category": { "type": "string" },
+          "logicalPath": { "type": "string" },
+          "objectId": { "type": "string" },
+          "sizeBytes": { "type": "integer", "minimum": 0 },
+          "sha256": { "type": "string" },
+          "sourceProvider": { "type": "string" },
+          "lastModifiedUtc": { "type": ["string", "null"], "format": "date-time" }
+        },
+        "required": ["id", "category", "logicalPath", "objectId", "sizeBytes", "sha256"]
+      }
+    }
+  },
+  "required": ["schemaVersion", "snapshotId", "deviceId", "repositoryId", "createdAtUtc", "state", "totalBytes", "totalItems", "items"]
+}

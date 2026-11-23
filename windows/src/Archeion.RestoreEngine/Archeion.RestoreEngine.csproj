@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\shared\Archeion.Contracts\Archeion.Contracts.csproj" />
+    <ProjectReference Include="..\Archeion.Domain\Archeion.Domain.csproj" />
+    <ProjectReference Include="..\Archeion.ObjectStore\Archeion.ObjectStore.csproj" />
+    <ProjectReference Include="..\Archeion.Persistence\Archeion.Persistence.csproj" />
+    <ProjectReference Include="..\Archeion.Security\Archeion.Security.csproj" />
+    <ProjectReference Include="..\Archeion.CapabilityEngine\Archeion.CapabilityEngine.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,44 @@
+# ARCHEION Root .gitignore
+## .NET / Visual Studio
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+## SQLite
+*.sqlite-shm
+*.sqlite-wal
+*.db-shm
+*.db-wal
+
+## Logs & Diagnostics
+*.log
+logs/
+repository-checks/
+staging/
+
+## Android
+.gradle/
+build/
+android/app/build/
+android/.gradle/
+*.apk
+*.aab
+local.properties
+.idea/
+*.iml
+captures/
+.externalNativeBuild/
+.cxx/
+
+## OS-specific
+Thumbs.db
+Desktop.ini
+.DS_Store

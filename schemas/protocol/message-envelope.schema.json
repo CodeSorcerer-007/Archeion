@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ArcheionMessageEnvelope",
+  "type": "object",
+  "properties": {
+    "protocolVersion": { "type": "string" },
+    "sessionId": { "type": "string", "format": "uuid" },
+    "messageId": { "type": "string", "format": "uuid" },
+    "correlationId": { "type": ["string", "null"], "format": "uuid" },
+    "messageType": { "type": "string" },
+    "timestampUtc": { "type": "string", "format": "date-time" },
+    "payloadJson": { "type": "string" }
+  },
+  "required": ["protocolVersion", "sessionId", "messageId", "messageType", "timestampUtc"]
+}

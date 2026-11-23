@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="Archeion_App.Pages.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <ScrollViewer Padding="24,16,24,24">
+        <StackPanel Spacing="20" MaxWidth="800" HorizontalAlignment="Left">
+            <StackPanel Spacing="4">
+                <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Settings" FontWeight="SemiBold" />
+                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           Text="Configure storage locations, backup scheduling triggers, and emergency recovery keys." />
+            </StackPanel>
+
+            <TextBlock Text="Repository Location" Style="{StaticResource SubtitleTextBlockStyle}" FontWeight="SemiBold" />
+            <TextBox x:Name="TxtRepoPath" IsReadOnly="True" />
+
+            <TextBlock Text="Scheduling &amp; Automation" Style="{StaticResource SubtitleTextBlockStyle}" FontWeight="SemiBold" />
+            <ToggleSwitch x:Name="ToggleAutoBackup" Header="Automatic Backup on Device Connect" IsOn="True" />
+
+            <TextBlock Text="Emergency Recovery Key (256-bit)" Style="{StaticResource SubtitleTextBlockStyle}" FontWeight="SemiBold" />
+            <TextBlock Text="If you forget your master password, this 256-bit emergency recovery key is the ONLY method to unlock your encrypted repository."
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+            <Button x:Name="BtnGenKey" Content="Generate / View Emergency Key" Click="BtnGenKey_Click" />
+            <TextBox x:Name="TxtEmergencyKey" IsReadOnly="True" AcceptsReturn="True" Height="80" TextWrapping="Wrap" />
+        </StackPanel>
+    </ScrollViewer>
+</Page>

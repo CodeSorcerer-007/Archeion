@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="Archeion_App.Pages.DevicesPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <ScrollViewer Padding="24,16,24,24">
+        <StackPanel Spacing="20" MaxWidth="1000" HorizontalAlignment="Left">
+            <StackPanel Spacing="4">
+                <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Devices &amp; Discovery" FontWeight="SemiBold" />
+                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           Text="Discover local USB ADB devices and ARCHEION Android Companion endpoints over LAN." />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="12">
+                <Button x:Name="BtnScan" Content="Scan Endpoints" Click="BtnScan_Click" />
+                <TextBlock x:Name="TxtStatus" VerticalAlignment="Center" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+
+            <TextBlock Text="Discovered Devices" Style="{StaticResource SubtitleTextBlockStyle}" FontWeight="SemiBold" />
+            <ListView x:Name="ListEndpoints" SelectionChanged="ListEndpoints_SelectionChanged" Height="150"
+                      BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" CornerRadius="8">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Padding="8">
+                            <TextBlock Text="{Binding EndpointIdentifier}" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding TransportType}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <TextBlock Text="Live Capability &amp; Permission Audit" Style="{StaticResource SubtitleTextBlockStyle}" FontWeight="SemiBold" />
+            <ListView x:Name="ListCapabilities" Height="250"
+                      BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" CornerRadius="8">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Padding="8" ColumnSpacing="16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150" />
+                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding Category}" FontWeight="SemiBold" />
+                            <TextBlock Grid.Column="1" Text="{Binding Status}" />
+                            <TextBlock Grid.Column="2" Text="{Binding Reason}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

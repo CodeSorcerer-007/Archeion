@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Archeion.App (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Archeion.App (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

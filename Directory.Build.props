@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <LangVersion>preview</LangVersion>
+    <Company>ARCHEION Personal Preservation</Company>
+    <Product>ARCHEION</Product>
+    <Authors>ARCHEION</Authors>
+    <Copyright>Copyright © 2026 ARCHEION</Copyright>
+  </PropertyGroup>
+</Project>

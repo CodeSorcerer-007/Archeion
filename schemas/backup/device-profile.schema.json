@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ArcheionDeviceProfile",
+  "type": "object",
+  "properties": {
+    "deviceId": { "type": "string", "format": "uuid" },
+    "displayName": { "type": "string" },
+    "manufacturer": { "type": "string" },
+    "brand": { "type": "string" },
+    "model": { "type": "string" },
+    "modelCode": { "type": "string" },
+    "product": { "type": "string" },
+    "codename": { "type": "string" },
+    "androidVersion": { "type": "string" },
+    "apiLevel": { "type": "integer", "minimum": 1 },
+    "buildFingerprint": { "type": "string" },
+    "securityPatch": { "type": "string" },
+    "firstSeenUtc": { "type": "string", "format": "date-time" },
+    "lastSeenUtc": { "type": "string", "format": "date-time" },
+    "confidence": { "type": "string", "enum": ["High", "Moderate", "Low", "Uncertain"] }
+  },
+  "required": ["deviceId", "displayName", "manufacturer", "model", "androidVersion", "apiLevel", "firstSeenUtc", "lastSeenUtc"]
+}

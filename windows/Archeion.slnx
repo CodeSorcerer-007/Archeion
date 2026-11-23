@@ -1,0 +1,25 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Archeion.Adb/Archeion.Adb.csproj" />
+    <Project Path="src/Archeion.App/Archeion.App.csproj">
+      <Platform Project="x86" />
+    </Project>
+    <Project Path="src/Archeion.Application/Archeion.Application.csproj" />
+    <Project Path="src/Archeion.BackupEngine/Archeion.BackupEngine.csproj" />
+    <Project Path="src/Archeion.CapabilityEngine/Archeion.CapabilityEngine.csproj" />
+    <Project Path="src/Archeion.DeviceDiscovery/Archeion.DeviceDiscovery.csproj" />
+    <Project Path="src/Archeion.Domain/Archeion.Domain.csproj" />
+    <Project Path="src/Archeion.ObjectStore/Archeion.ObjectStore.csproj" />
+    <Project Path="src/Archeion.Persistence/Archeion.Persistence.csproj" />
+    <Project Path="src/Archeion.RestoreEngine/Archeion.RestoreEngine.csproj" />
+    <Project Path="src/Archeion.Security/Archeion.Security.csproj" />
+    <Project Path="src/Archeion.SnapshotComparison/Archeion.SnapshotComparison.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Archeion.IntegrationTests/Archeion.IntegrationTests.csproj" />
+    <Project Path="tests/Archeion.SecurityTests/Archeion.SecurityTests.csproj" />
+    <Project Path="tests/Archeion.StorageTests/Archeion.StorageTests.csproj" />
+    <Project Path="tests/Archeion.UnitTests/Archeion.UnitTests.csproj" />
+  </Folder>
+  <Project Path="../shared/Archeion.Contracts/Archeion.Contracts.csproj" />
+</Solution>
