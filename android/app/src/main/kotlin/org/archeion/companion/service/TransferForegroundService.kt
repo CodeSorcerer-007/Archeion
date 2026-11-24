@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.archeion.companion.ArcheionApplication
 import org.archeion.companion.MainActivity
+import org.archeion.companion.protocol.SessionSummary
 
 data class TransferState(
     val isActive: Boolean = false,
@@ -22,7 +23,9 @@ data class TransferState(
     val processedBytes: Long = 0,
     val totalBytes: Long = 0,
     val processedItems: Long = 0,
-    val totalItems: Long = 0
+    val totalItems: Long = 0,
+    val lastSession: SessionSummary? = null,
+    val lastCompletedTime: Long? = null
 ) {
     val progressPercent: Int
         get() = if (totalBytes > 0) ((processedBytes.toDouble() / totalBytes) * 100).toInt().coerceIn(0, 100) else 0
@@ -48,7 +51,7 @@ class TransferForegroundService : Service() {
             processedItems: Long,
             totalItems: Long
         ) {
-            _transferState.value = TransferState(
+            _transferState.value = _transferState.value.copy(
                 isActive = true,
                 currentItemName = itemName,
                 currentCategory = category,
@@ -59,8 +62,16 @@ class TransferForegroundService : Service() {
             )
         }
 
+        fun recordCompletion(summary: SessionSummary) {
+            _transferState.value = _transferState.value.copy(
+                isActive = false,
+                lastSession = summary,
+                lastCompletedTime = System.currentTimeMillis()
+            )
+        }
+
         fun completeTransfer() {
-            _transferState.value = TransferState(isActive = false)
+            _transferState.value = _transferState.value.copy(isActive = false)
         }
     }
 
@@ -108,24 +119,16 @@ class TransferForegroundService : Service() {
             this,
             0,
             Intent(this, MainActivity::class.java),
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        val stopIntent = PendingIntent.getService(
-            this,
-            1,
-            Intent(this, TransferForegroundService::class.java).apply { action = ACTION_STOP },
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
         return NotificationCompat.Builder(this, ArcheionApplication.CHANNEL_ID_DATA_SYNC)
             .setContentTitle(title)
             .setContentText(text)
             .setSmallIcon(android.R.drawable.stat_sys_download)
-            .setOngoing(true)
+            .setProgress(100, progress, false)
             .setContentIntent(pendingIntent)
-            .setProgress(100, progress, progress == 0)
-            .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Cancel", stopIntent)
+            .setOngoing(true)
             .build()
     }
 }

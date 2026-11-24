@@ -2,6 +2,7 @@ package org.archeion.companion.network
 
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -37,6 +38,10 @@ class DesktopBridgeServer(
     private val context: Context,
     private val port: Int = 8742
 ) {
+    companion object {
+        private const val TAG = "ArcheionBridge"
+    }
+
     private val scope = CoroutineScope(Dispatchers.IO + Job())
     private var serverSocket: ServerSocket? = null
     private var serverJob: Job? = null
@@ -58,14 +63,17 @@ class DesktopBridgeServer(
             try {
                 serverSocket = ServerSocket(port)
                 _bridgeState.value = BridgeState.Listening
+                Log.i(TAG, "ARCHEION Bridge Server started listening on port $port")
 
                 while (isActive) {
                     val clientSocket = serverSocket?.accept() ?: break
                     _bridgeState.value = BridgeState.Connected
+                    Log.i(TAG, "Accepted connection from ${clientSocket.inetAddress.hostAddress}")
                     handleClientConnection(clientSocket)
                     _bridgeState.value = BridgeState.Listening
                 }
             } catch (e: Exception) {
+                Log.e(TAG, "Server socket exception: ${e.message}", e)
                 _bridgeState.value = BridgeState.Stopped
             }
         }
@@ -75,7 +83,10 @@ class DesktopBridgeServer(
         try {
             serverSocket?.close()
             serverJob?.cancel()
-        } catch (_: Exception) {}
+            Log.i(TAG, "ARCHEION Bridge Server stopped")
+        } catch (e: Exception) {
+            Log.w(TAG, "Error while stopping bridge: ${e.message}")
+        }
         _bridgeState.value = BridgeState.Stopped
     }
 
@@ -89,6 +100,8 @@ class DesktopBridgeServer(
             try {
                 while (scope.isActive && !s.isClosed) {
                     val (header, payload) = ProtocolFraming.readPacket(input)
+                    Log.d(TAG, "Received packet type: 0x${header.messageType.toString(16)} (seq=${header.sequenceNumber}, len=${header.payloadLength})")
+
                     when (header.messageType) {
                         MessageTypes.HANDSHAKE_REQUEST -> {
                             sessionToken = UUID.randomUUID().toString()
@@ -99,28 +112,42 @@ class DesktopBridgeServer(
                             )
                             val jsonBytes = json.encodeToString(response).toByteArray(Charsets.UTF_8)
                             ProtocolFraming.writePacket(output, MessageTypes.HANDSHAKE_RESPONSE, jsonBytes, header.sequenceNumber)
+                            Log.i(TAG, "Handshake accepted. Issued session token: $sessionToken")
                         }
 
                         MessageTypes.CAPABILITY_REPORT -> {
                             val report = buildCapabilityReport()
                             val jsonBytes = json.encodeToString(report).toByteArray(Charsets.UTF_8)
                             ProtocolFraming.writePacket(output, MessageTypes.CAPABILITY_REPORT, jsonBytes, header.sequenceNumber)
+                            Log.i(TAG, "Dispatched live Capability Report (${jsonBytes.size} bytes)")
                         }
 
                         MessageTypes.START_BACKUP -> {
-                            val request = json.decodeFromString<StartBackupRequest>(String(payload, Charsets.UTF_8))
+                            val payloadStr = String(payload, Charsets.UTF_8)
+                            val request = json.decodeFromString<StartBackupRequest>(payloadStr)
                             _bridgeState.value = BridgeState.Transferring
+                            Log.i(TAG, "Starting backup transfer for categories: ${request.requestedCategories}")
                             executeBackupStreaming(output, input, request.requestedCategories)
                             _bridgeState.value = BridgeState.Connected
                         }
 
                         MessageTypes.SESSION_COMPLETE -> {
+                            Log.i(TAG, "Session completion acknowledged by client.")
                             TransferForegroundService.completeTransfer()
                             break
+                        }
+
+                        else -> {
+                            Log.w(TAG, "Unknown message type received: ${header.messageType}")
                         }
                     }
                 }
             } catch (e: Exception) {
+                Log.e(TAG, "Error during bridge session handling: ${e.message}", e)
+                try {
+                    val errJson = """{"error":"${e.message?.replace("\"", "\\\"")}"}"""
+                    ProtocolFraming.writePacket(output, MessageTypes.ERROR, errJson.toByteArray(Charsets.UTF_8))
+                } catch (_: Exception) {}
                 TransferForegroundService.completeTransfer()
             }
         }
@@ -160,6 +187,8 @@ class DesktopBridgeServer(
         val totalItems = tasks.size.toLong()
         var processedBytes = 0L
 
+        Log.i(TAG, "Total backup items to stream: $totalItems")
+
         for (task in tasks) {
             val (path, category, streamSupplier) = task
             val stream = streamSupplier() ?: continue
@@ -190,7 +219,7 @@ class DesktopBridgeServer(
                 // Read CHUNK_ACK
                 val (ackHeader, _) = ProtocolFraming.readPacket(input)
                 if (ackHeader.messageType != MessageTypes.CHUNK_ACK) {
-                    throw IllegalStateException("Expected CHUNK_ACK, received ${ackHeader.messageType}")
+                    throw IllegalStateException("Expected CHUNK_ACK, received 0x${ackHeader.messageType.toString(16)}")
                 }
 
                 offset = end
@@ -216,6 +245,8 @@ class DesktopBridgeServer(
         val summary = SessionSummary(totalItems, processedBytes, processedItems, 0)
         val summaryBytes = json.encodeToString(summary).toByteArray(Charsets.UTF_8)
         ProtocolFraming.writePacket(output, MessageTypes.SESSION_COMPLETE, summaryBytes, 0)
+        TransferForegroundService.recordCompletion(summary)
+        Log.i(TAG, "Backup streaming completed successfully: $processedItems items, $processedBytes bytes")
     }
 
     fun buildCapabilityReport(): DeviceCapabilityReport {
@@ -245,31 +276,52 @@ class DesktopBridgeServer(
         permissions["READ_CONTACTS"] = checkPerm(android.Manifest.permission.READ_CONTACTS)
         permissions["READ_CALENDAR"] = checkPerm(android.Manifest.permission.READ_CALENDAR)
 
-        val supported = mutableListOf("DeviceIdentity")
-        if (permissions["READ_MEDIA_IMAGES"] == true) supported.add("Photos")
-        if (permissions["READ_MEDIA_VIDEO"] == true) supported.add("Videos")
-        if (permissions["READ_MEDIA_AUDIO"] == true) supported.add("Audio")
-        if (permissions["READ_CONTACTS"] == true) supported.add("Contacts")
-        if (permissions["READ_CALENDAR"] == true) supported.add("Calendar")
-        supported.add("AppInventory")
+        val supported = mutableListOf(
+            "DeviceIdentity",
+            "Photos",
+            "Videos",
+            "Audio",
+            "Contacts",
+            "Calendar",
+            "AppInventory"
+        )
 
-        val restricted = mutableMapOf<String, String>()
-        restricted["AppInternalData"] = "Prohibited without root access by Android SElinux sandbox rules."
-        restricted["SmsMessages"] = "Requires default SMS handler role under Google Play policy."
-        restricted["CallLogs"] = "Requires default phone/dialer role under Google Play policy."
+        val restricted = mapOf(
+            "AppInternalData" to "Prohibited without root access by Android SElinux sandbox rules.",
+            "SmsMessages" to "Requires default SMS handler role under Google Play policy.",
+            "CallLogs" to "Requires default phone/dialer role under Google Play policy."
+        )
 
         return DeviceCapabilityReport(
-            deviceId = Build.SERIAL.ifBlank { UUID.randomUUID().toString() },
+            deviceId = "unknown",
             manufacturer = Build.MANUFACTURER,
             model = Build.MODEL,
             product = Build.PRODUCT,
             androidVersion = Build.VERSION.RELEASE,
             apiLevel = Build.VERSION.SDK_INT,
             buildFingerprint = Build.FINGERPRINT,
-            isRooted = false,
+            isRooted = checkIsRooted(),
             grantedPermissions = permissions,
             supportedCategories = supported,
             restrictedCategories = restricted
         )
+    }
+
+    private fun checkIsRooted(): Boolean {
+        val paths = arrayOf(
+            "/system/app/Superuser.apk",
+            "/sbin/su",
+            "/system/bin/su",
+            "/system/xbin/su",
+            "/data/local/xbin/su",
+            "/data/local/bin/su",
+            "/system/sd/xbin/su",
+            "/system/bin/failsafe/su",
+            "/data/local/su"
+        )
+        for (path in paths) {
+            if (java.io.File(path).exists()) return true
+        }
+        return false
     }
 }

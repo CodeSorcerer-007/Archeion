@@ -19,6 +19,7 @@ import org.archeion.companion.ui.MainViewModel
 fun DashboardScreen(viewModel: MainViewModel) {
     val bridgeState by viewModel.bridgeState.collectAsState()
     val capabilities by viewModel.capabilities.collectAsState()
+    val inventory by viewModel.inventory.collectAsState()
     val scrollState = rememberScrollState()
 
     Column(
@@ -72,6 +73,44 @@ fun DashboardScreen(viewModel: MainViewModel) {
             }
         }
 
+        // Category Inventory Card
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Preservable Storage Inventory", style = MaterialTheme.typography.titleSmall)
+                    if (inventory.isScanning) {
+                        CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                    }
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    InventoryStatItem("Photos", inventory.photosCount, Icons.Default.PhotoLibrary)
+                    InventoryStatItem("Videos", inventory.videosCount, Icons.Default.VideoLibrary)
+                    InventoryStatItem("Audio", inventory.audioCount, Icons.Default.Audiotrack)
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    InventoryStatItem("Contacts", inventory.contactsCount, Icons.Default.Contacts)
+                    InventoryStatItem("Calendar", inventory.calendarEventsCount, Icons.Default.CalendarMonth)
+                    InventoryStatItem("Apps", inventory.installedAppsCount, Icons.Default.Apps)
+                }
+            }
+        }
+
         // Device Info Card
         OutlinedCard(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(16.dp)) {
@@ -80,7 +119,7 @@ fun DashboardScreen(viewModel: MainViewModel) {
                 capabilities?.let { cap ->
                     Text("Model: ${cap.manufacturer} ${cap.model}")
                     Text("Android: ${cap.androidVersion} (API ${cap.apiLevel})")
-                    Text("Root Status: ${if (cap.isRooted) "Rooted" else "Standard (Non-root)"}")
+                    Text("Root Status: ${if (cap.isRooted) "Rooted" else "Standard Non-Root (Sandbox Enforced)"}")
                     Text("Build: ${cap.buildFingerprint.take(35)}...")
                 } ?: Text("Querying device hardware identity...")
             }
@@ -120,5 +159,34 @@ fun DashboardScreen(viewModel: MainViewModel) {
                 Text("Refresh Audit")
             }
         }
+    }
+}
+
+@Composable
+private fun InventoryStatItem(
+    title: String,
+    count: Int,
+    icon: androidx.compose.ui.graphics.vector.ImageVector
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.width(90.dp)
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(24.dp)
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = count.toString(),
+            style = MaterialTheme.typography.titleMedium
+        )
+        Text(
+            text = title,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
