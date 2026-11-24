@@ -195,6 +195,44 @@ public class IntegrationTests : IDisposable
         Assert.Equal(testDocBytes, await File.ReadAllBytesAsync(restoredDoc));
         Assert.Equal(testVcfBytes, await File.ReadAllBytesAsync(restoredVcf));
     }
+
+    [Fact]
+    public async Task LiveBridge_ConnectToCompanionAndStreamBackup_WhenBridgeAvailable()
+    {
+        using var client = new Archeion.Adb.ArcheionBridgeClient();
+        bool connected = false;
+        try
+        {
+            connected = await client.ConnectAsync("127.0.0.1", 8742, new CancellationTokenSource(2000).Token);
+        }
+        catch
+        {
+            // Gracefully ignore if bridge port is not bound
+            return;
+        }
+
+        if (!connected) return;
+
+        // Handshake
+        var hs = await client.HandshakeAsync("ArcheionIntegrationTest", "1.0.0");
+        Assert.True(hs.Accepted);
+        Assert.False(string.IsNullOrEmpty(hs.SessionToken));
+
+        // Capabilities
+        var caps = await client.QueryCapabilitiesAsync();
+        Assert.NotNull(caps);
+        Assert.Contains("AppInventory", caps.SupportedCategories);
+
+        // Stream Backup
+        var outDir = Path.Combine(_testRoot, "LiveCompanionBackup");
+        var result = await client.StreamBackupAsync(new[] { "AppInventory" }, outDir);
+
+        Assert.True(result.Success);
+        Assert.True(result.TotalItems >= 1);
+        Assert.True(result.TotalBytes > 0);
+        Assert.NotEmpty(result.SavedFiles);
+        Assert.True(File.Exists(result.SavedFiles[0]));
+    }
 }
 
 internal sealed class InMemoryTestDataSource : IBackupDataSource

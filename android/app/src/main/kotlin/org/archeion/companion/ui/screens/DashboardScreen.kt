@@ -1,14 +1,13 @@
 package org.archeion.companion.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -21,6 +20,8 @@ fun DashboardScreen(viewModel: MainViewModel) {
     val capabilities by viewModel.capabilities.collectAsState()
     val inventory by viewModel.inventory.collectAsState()
     val scrollState = rememberScrollState()
+
+    var selectedCategoryInfo by remember { mutableStateOf<Pair<String, String>?>(null) }
 
     Column(
         modifier = Modifier
@@ -70,6 +71,16 @@ fun DashboardScreen(viewModel: MainViewModel) {
                     },
                     style = MaterialTheme.typography.bodyMedium
                 )
+                if (bridgeState == BridgeState.Listening || bridgeState == BridgeState.Connected) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    AssistChip(
+                        onClick = {},
+                        label = { Text("mDNS LAN Auto-Discovery: _archeion._tcp") },
+                        leadingIcon = {
+                            Icon(Icons.Default.Wifi, contentDescription = null, modifier = Modifier.size(16.dp))
+                        }
+                    )
+                }
             }
         }
 
@@ -89,24 +100,38 @@ fun DashboardScreen(viewModel: MainViewModel) {
                         CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
                     }
                 }
+                Spacer(modifier = Modifier.height(4.dp))
+                Text("Tap any category to inspect preservation details", style = MaterialTheme.typography.labelSmall)
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    InventoryStatItem("Photos", inventory.photosCount, Icons.Default.PhotoLibrary)
-                    InventoryStatItem("Videos", inventory.videosCount, Icons.Default.VideoLibrary)
-                    InventoryStatItem("Audio", inventory.audioCount, Icons.Default.Audiotrack)
+                    InventoryStatItem("Photos", inventory.photosCount, Icons.Default.PhotoLibrary) {
+                        selectedCategoryInfo = "Photos & Images" to "${inventory.photosCount} photos discovered in DCIM/Camera via MediaStore.\n\nPreserved in full resolution with original EXIF metadata intact."
+                    }
+                    InventoryStatItem("Videos", inventory.videosCount, Icons.Default.VideoLibrary) {
+                        selectedCategoryInfo = "Videos" to "${inventory.videosCount} video recordings discovered via MediaStore.\n\nPreserved without lossy transcoding or recompression."
+                    }
+                    InventoryStatItem("Audio", inventory.audioCount, Icons.Default.Audiotrack) {
+                        selectedCategoryInfo = "Audio & Music" to "${inventory.audioCount} audio files discovered.\n\nIncludes voice recordings, downloaded music, and podcasts."
+                    }
                 }
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    InventoryStatItem("Contacts", inventory.contactsCount, Icons.Default.Contacts)
-                    InventoryStatItem("Calendar", inventory.calendarEventsCount, Icons.Default.CalendarMonth)
-                    InventoryStatItem("Apps", inventory.installedAppsCount, Icons.Default.Apps)
+                    InventoryStatItem("Contacts", inventory.contactsCount, Icons.Default.Contacts) {
+                        selectedCategoryInfo = "Contacts" to "${inventory.contactsCount} contacts indexed.\n\nPreserved via RFC 6350 / vCard 3.0 standard with phones, emails, and postal addresses."
+                    }
+                    InventoryStatItem("Calendar", inventory.calendarEventsCount, Icons.Default.CalendarMonth) {
+                        selectedCategoryInfo = "Calendar Events" to "${inventory.calendarEventsCount} calendar events indexed.\n\nPreserved via RFC 5545 / iCalendar 2.0 with UTC event timestamps and recurrence rules."
+                    }
+                    InventoryStatItem("Apps", inventory.installedAppsCount, Icons.Default.Apps) {
+                        selectedCategoryInfo = "Installed Applications" to "${inventory.installedAppsCount} installed packages cataloged.\n\nPreserves complete application registry (package name, version codes, SDK targets) and extractable base APKs."
+                    }
                 }
             }
         }
@@ -160,17 +185,36 @@ fun DashboardScreen(viewModel: MainViewModel) {
             }
         }
     }
+
+    // Detail dialog when an inventory item is tapped
+    selectedCategoryInfo?.let { (title, description) ->
+        AlertDialog(
+            onDismissRequest = { selectedCategoryInfo = null },
+            icon = { Icon(Icons.Default.Info, contentDescription = null) },
+            title = { Text(title) },
+            text = { Text(description) },
+            confirmButton = {
+                TextButton(onClick = { selectedCategoryInfo = null }) {
+                    Text("Close")
+                }
+            }
+        )
+    }
 }
 
 @Composable
 private fun InventoryStatItem(
     title: String,
     count: Int,
-    icon: androidx.compose.ui.graphics.vector.ImageVector
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    onClick: () -> Unit = {}
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.width(90.dp)
+        modifier = Modifier
+            .width(90.dp)
+            .clickable { onClick() }
+            .padding(vertical = 4.dp)
     ) {
         Icon(
             imageVector = icon,

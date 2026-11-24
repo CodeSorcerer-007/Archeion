@@ -55,6 +55,7 @@ class DesktopBridgeServer(
     private val contactsExporter = ContactsVcfExporter(context)
     private val calendarExporter = CalendarIcsExporter(context)
     private val appProvider = AppInventoryProvider(context)
+    private val nsdManager = ArcheionNsdManager(context)
 
     fun start() {
         if (serverJob != null && serverJob?.isActive == true) return
@@ -64,6 +65,7 @@ class DesktopBridgeServer(
                 serverSocket = ServerSocket(port)
                 _bridgeState.value = BridgeState.Listening
                 Log.i(TAG, "ARCHEION Bridge Server started listening on port $port")
+                nsdManager.registerService(port)
 
                 while (isActive) {
                     val clientSocket = serverSocket?.accept() ?: break
@@ -81,6 +83,7 @@ class DesktopBridgeServer(
 
     fun stop() {
         try {
+            nsdManager.unregisterService()
             serverSocket?.close()
             serverJob?.cancel()
             Log.i(TAG, "ARCHEION Bridge Server stopped")
@@ -143,11 +146,15 @@ class DesktopBridgeServer(
                     }
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Error during bridge session handling: ${e.message}", e)
-                try {
-                    val errJson = """{"error":"${e.message?.replace("\"", "\\\"")}"}"""
-                    ProtocolFraming.writePacket(output, MessageTypes.ERROR, errJson.toByteArray(Charsets.UTF_8))
-                } catch (_: Exception) {}
+                if (e is IllegalStateException && e.message?.contains("End of stream") == true) {
+                    Log.i(TAG, "Bridge client disconnected normally.")
+                } else {
+                    Log.e(TAG, "Error during bridge session handling: ${e.message}", e)
+                    try {
+                        val errJson = """{"error":"${e.message?.replace("\"", "\\\"")}"}"""
+                        ProtocolFraming.writePacket(output, MessageTypes.ERROR, errJson.toByteArray(Charsets.UTF_8))
+                    } catch (_: Exception) {}
+                }
                 TransferForegroundService.completeTransfer()
             }
         }

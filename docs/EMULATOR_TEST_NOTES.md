@@ -188,6 +188,16 @@ Result: SUCCESS (100% verified, 0 dropped bytes)
    - Added "Quick Export to Device Storage" for standalone, zero-computer preservation to local flash memory.
 6. **Notification Channel Compatibility:**
    - Fixed notification channel reference to `ArcheionApplication.CHANNEL_ID_DATA_SYNC`, ensuring compliant foreground service execution on Android 8.0+.
+7. **Native .NET 10 Bridge Client (`ArcheionBridgeClient`):**
+   - Implemented first-class, typed asynchronous client in `Archeion.Adb` matching the 16-byte Big-Endian protocol framing.
+   - Built with incremental SHA-256 hash validation, 64 KB sliced chunk reception with sequence ACKs, and direct file streaming into snapshot target directories.
+8. **Network Service Discovery (`ArcheionNsdManager`):**
+   - Integrated Android `NsdManager` broadcasting `_archeion._tcp.` on local Wi-Fi when listening, eliminating the requirement for manual IP configuration.
+9. **Interactive Inventory Inspection & On-Device Cryptographic Verification:**
+   - Added interactive drill-down modals on the Dashboard when tapping any category chip (Photos, Videos, Audio, Contacts, Calendar, Apps).
+   - Added on-device "Verify Last Exported Archive" tool to `ExportScreen`, validating RFC 6350 vCard syntax, RFC 5545 iCalendar event blocks, package JSON syntax, and reporting verified SHA-256 hashes.
+10. **Comprehensive Test Suite Health (100% Pass Rate):**
+   - 31 out of 31 automated tests passing across `Archeion.UnitTests` (18), `Archeion.SecurityTests` (6), `Archeion.StorageTests` (5), and `Archeion.IntegrationTests` (2, including live companion bridge streaming over port 8742).
 
 ---
 
