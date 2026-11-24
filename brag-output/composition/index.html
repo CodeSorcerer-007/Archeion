@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --ground: #070B12;
+        --surface: #0E1626;
+        --surface-border: #1E293B;
+        --ink: #F8FAFC;
+        --ink-muted: #94A3B8;
+        --cyan: #00E5FF;
+        --blue: #3B82F6;
+        --emerald: #10B981;
+        --amber: #F59E0B;
+        --font-sans: 'Inter', sans-serif;
+        --font-mono: 'JetBrains Mono', monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html, body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--ground);
+        font-family: var(--font-sans);
+        color: var(--ink);
+      }
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+      }
+
+      /* Cybernetic Background Grid & Particles */
+      .bg-grid {
+        position: absolute;
+        inset: 0;
+        background-size: 60px 60px;
+        background-image: 
+          linear-gradient(to right, rgba(0, 229, 255, 0.05) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(0, 229, 255, 0.05) 1px, transparent 1px);
+        pointer-events: none;
+      }
+      .bg-glow-radial {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 1200px;
+        height: 800px;
+        background: radial-gradient(circle, rgba(0, 229, 255, 0.12) 0%, rgba(59, 130, 246, 0.05) 50%, transparent 75%);
+        pointer-events: none;
+      }
+
+      /* Global Top Bar */
+      .global-topbar {
+        position: absolute;
+        top: 40px;
+        left: 80px;
+        right: 80px;
+        height: 50px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 16px;
+        z-index: 100;
+      }
+      .brand-badge {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: 0.15em;
+        color: var(--cyan);
+        text-transform: uppercase;
+      }
+      .brand-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--cyan);
+        box-shadow: 0 0 14px var(--cyan);
+      }
+      .topbar-meta {
+        font-family: var(--font-mono);
+        font-size: 18px;
+        color: var(--ink-muted);
+        letter-spacing: 0.05em;
+      }
+
+      /* Scene Styles */
+      .scene {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 120px 80px 80px 80px;
+      }
+
+      /* Scene 1: Hook */
+      .hook-tag {
+        font-family: var(--font-mono);
+        font-size: 24px;
+        color: var(--amber);
+        text-transform: uppercase;
+        letter-spacing: 0.25em;
+        margin-bottom: 24px;
+        background: rgba(245, 158, 11, 0.1);
+        padding: 10px 28px;
+        border-radius: 9999px;
+        border: 1px solid rgba(245, 158, 11, 0.3);
+      }
+      .hook-title {
+        font-size: 76px;
+        font-weight: 900;
+        text-align: center;
+        line-height: 1.15;
+        letter-spacing: -0.02em;
+        max-width: 1400px;
+        margin-bottom: 32px;
+      }
+      .hook-title span {
+        color: var(--cyan);
+        text-shadow: 0 0 35px rgba(0, 229, 255, 0.4);
+      }
+      .hook-sub {
+        font-size: 32px;
+        color: var(--ink-muted);
+        text-align: center;
+        max-width: 1100px;
+        line-height: 1.5;
+      }
+
+      /* Scene 2: Discovery */
+      .section-badge {
+        font-family: var(--font-mono);
+        font-size: 20px;
+        color: var(--cyan);
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        margin-bottom: 16px;
+      }
+      .section-title {
+        font-size: 56px;
+        font-weight: 900;
+        margin-bottom: 40px;
+        text-align: center;
+      }
+      .discovery-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+        width: 100%;
+        max-width: 1500px;
+        margin-bottom: 36px;
+      }
+      .discovery-card {
+        background: var(--surface);
+        border: 1px solid var(--surface-border);
+        border-radius: 16px;
+        padding: 32px 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
+      .card-icon {
+        font-size: 44px;
+        margin-bottom: 16px;
+      }
+      .card-name {
+        font-size: 30px;
+        font-weight: 800;
+        margin-bottom: 8px;
+        color: var(--ink);
+      }
+      .card-scope {
+        font-family: var(--font-mono);
+        font-size: 18px;
+        color: var(--cyan);
+        margin-bottom: 12px;
+      }
+      .card-desc {
+        font-size: 18px;
+        color: var(--ink-muted);
+        line-height: 1.4;
+      }
+      .conn-banner {
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        border-radius: 12px;
+        padding: 16px 36px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-family: var(--font-mono);
+        font-size: 22px;
+        color: var(--emerald);
+      }
+
+      /* Scene 3: Streaming */
+      .stream-container {
+        width: 100%;
+        max-width: 1300px;
+        background: var(--surface);
+        border: 1px solid var(--surface-border);
+        border-radius: 20px;
+        padding: 48px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      }
+      .stream-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32px;
+      }
+      .stream-protocol {
+        font-family: var(--font-mono);
+        font-size: 24px;
+        color: var(--cyan);
+      }
+      .stream-speed {
+        font-family: var(--font-mono);
+        font-size: 40px;
+        font-weight: 800;
+        color: var(--emerald);
+      }
+      .progress-track {
+        width: 100%;
+        height: 22px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 9999px;
+        overflow: hidden;
+        margin-bottom: 24px;
+        position: relative;
+      }
+      .progress-fill {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 0%;
+        background: linear-gradient(90deg, var(--blue), var(--cyan));
+        box-shadow: 0 0 20px var(--cyan);
+        border-radius: 9999px;
+      }
+      .stream-stats {
+        display: flex;
+        justify-content: space-between;
+        font-family: var(--font-mono);
+        font-size: 22px;
+        color: var(--ink-muted);
+      }
+
+      /* Scene 4: Sealing */
+      .seal-box {
+        background: var(--surface);
+        border: 1px solid var(--surface-border);
+        border-radius: 20px;
+        padding: 48px 64px;
+        max-width: 1200px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      }
+      .hash-pill {
+        font-family: var(--font-mono);
+        font-size: 22px;
+        color: var(--cyan);
+        background: rgba(0, 229, 255, 0.1);
+        border: 1px solid rgba(0, 229, 255, 0.3);
+        padding: 14px 32px;
+        border-radius: 10px;
+        margin-bottom: 28px;
+        letter-spacing: 0.05em;
+        word-break: break-all;
+      }
+      .verified-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 34px;
+        font-weight: 900;
+        color: var(--emerald);
+        margin-bottom: 24px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .seal-details {
+        font-size: 28px;
+        color: var(--ink-muted);
+        line-height: 1.6;
+      }
+
+      /* Scene 5: Outro */
+      .outro-brand {
+        font-size: 110px;
+        font-weight: 900;
+        letter-spacing: 0.18em;
+        color: var(--ink);
+        margin-bottom: 16px;
+        text-transform: uppercase;
+        text-shadow: 0 0 50px rgba(0, 229, 255, 0.4);
+      }
+      .outro-sub {
+        font-size: 34px;
+        font-weight: 700;
+        color: var(--cyan);
+        margin-bottom: 40px;
+        letter-spacing: 0.1em;
+        text-align: center;
+      }
+      .outro-badges {
+        display: flex;
+        gap: 24px;
+        margin-bottom: 48px;
+      }
+      .outro-pill {
+        background: var(--surface);
+        border: 1px solid var(--surface-border);
+        border-radius: 9999px;
+        padding: 16px 36px;
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        color: var(--ink);
+      }
+      .outro-url {
+        font-family: var(--font-mono);
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--emerald);
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        padding: 16px 48px;
+        border-radius: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="20"
+      data-width="1920"
+      data-height="1080"
+    >
+      <!-- Background Elements -->
+      <div class="bg-grid"></div>
+      <div class="bg-glow-radial"></div>
+
+      <!-- Top Header Brand HUD -->
+      <div class="global-topbar" data-layout-ignore="true">
+        <div class="brand-badge">
+          <div class="brand-dot"></div>
+          ARCHEION PRESERVATION ENGINE
+        </div>
+        <div class="topbar-meta">OFFLINE-FIRST // SOVEREIGN ENCRYPTION</div>
+      </div>
+
+      <!-- Scene 1: The Hook (0.0s - 3.5s) -->
+      <div id="scene-1" class="clip scene" data-start="0" data-duration="3.5" data-track-index="0">
+        <div id="s1-content" style="display: flex; flex-direction: column; align-items: center;">
+          <div class="hook-tag" data-layout-ignore="true">Critical Sovereign Reality</div>
+          <h1 class="hook-title">Your Personal Memories Do Not Belong To <span>The Cloud</span>.</h1>
+          <p class="hook-sub">Zero telemetry. Zero subscriptions. True cryptographic ownership of your Android device data.</p>
+        </div>
+      </div>
+
+      <!-- Scene 2: Discovery & Inventory (3.5s - 7.5s) -->
+      <div id="scene-2" class="clip scene" data-start="3.5" data-duration="4.0" data-track-index="0">
+        <div id="s2-content" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+          <div class="section-badge" data-layout-ignore="true">Stage 01 // Device Audit</div>
+          <h2 class="section-title">Truthful Hardware & Storage Discovery</h2>
+          <div class="discovery-grid">
+            <div class="discovery-card" id="card-1">
+              <div class="card-icon">📸</div>
+              <div class="card-name">MediaStore</div>
+              <div class="card-scope" data-layout-ignore="true">FULL RESOLUTION</div>
+              <div class="card-desc" data-layout-ignore="true">Lossless photos, 4K videos & raw camera captures.</div>
+            </div>
+            <div class="discovery-card" id="card-2">
+              <div class="card-icon">📇</div>
+              <div class="card-name">Contacts</div>
+              <div class="card-scope" data-layout-ignore="true">RFC 6350 VCARD</div>
+              <div class="card-desc" data-layout-ignore="true">Bit-exact address book preservation.</div>
+            </div>
+            <div class="discovery-card" id="card-3">
+              <div class="card-icon">📅</div>
+              <div class="card-name">Calendar</div>
+              <div class="card-scope" data-layout-ignore="true">RFC 5545 ICAL</div>
+              <div class="card-desc" data-layout-ignore="true">Sovereign recurring event schedules.</div>
+            </div>
+            <div class="discovery-card" id="card-4">
+              <div class="card-icon">📦</div>
+              <div class="card-name">App Inventory</div>
+              <div class="card-scope" data-layout-ignore="true">JSON CATALOG</div>
+              <div class="card-desc" data-layout-ignore="true">Installed package signatures and metadata.</div>
+            </div>
+          </div>
+          <div class="conn-banner" id="s2-banner" data-layout-ignore="true">
+            <span>● mDNS Auto-Discovery: <b>_archeion._tcp.</b> on Port 8742 (Android 16 Active)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scene 3: Framed Protocol Streaming (7.5s - 12.0s) -->
+      <div id="scene-3" class="clip scene" data-start="7.5" data-duration="4.5" data-track-index="0">
+        <div id="s3-content" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+          <div class="section-badge" data-layout-ignore="true">Stage 02 // Protocol Streaming</div>
+          <h2 class="section-title">16-Byte Big-Endian Framed Packet Stream</h2>
+          <div class="stream-container">
+            <div class="stream-header">
+              <div class="stream-protocol">Protocol Magic: 0x41524348 (ARCH) • Type: 0x0003 (CHUNK)</div>
+              <div class="stream-speed" id="s3-speed">48.5 MB/s</div>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" id="s3-progress"></div>
+            </div>
+            <div class="stream-stats" data-layout-ignore="true">
+              <span>Streaming Chunk <b id="s3-chunk">4,812 / 4,812</b></span>
+              <span>Sequence ACKs: <b>100% OK</b></span>
+              <span>Hardware Link: <b>USB 3.2 High-Speed</b></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scene 4: Cryptographic Sealing (12.0s - 16.5s) -->
+      <div id="scene-4" class="clip scene" data-start="12.0" data-duration="4.5" data-track-index="0">
+        <div id="s4-content" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+          <div class="section-badge" data-layout-ignore="true">Stage 03 // Immutable Object Store</div>
+          <h2 class="section-title">Cryptographic Content-Addressable Sealing</h2>
+          <div class="seal-box">
+            <div class="hash-pill" id="s4-hash" data-layout-ignore="true">
+              sha256: 7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069
+            </div>
+            <div class="verified-badge" id="s4-badge">
+              <span>✓ 100% Bit-Exact Integrity Verified</span>
+            </div>
+            <div class="seal-details">
+              Argon2id Key Derivation • AES-256-GCM Authenticated Encryption<br />
+              Snapshot #004 Sealed Atomically into Sovereign Local Vault
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scene 5: Outro & Call to Action (16.5s - 20.0s) -->
+      <div id="scene-5" class="clip scene" data-start="16.5" data-duration="3.5" data-track-index="0">
+        <div id="s5-content" style="display: flex; flex-direction: column; align-items: center;">
+          <h1 class="outro-brand">ARCHEION</h1>
+          <div class="outro-sub">SOVEREIGN ANDROID PRESERVATION & HARDWARE SNAPSHOT ENGINE</div>
+          <div class="outro-badges" data-layout-ignore="true">
+            <div class="outro-pill" id="s5-pill-1">100% LOCAL-FIRST</div>
+            <div class="outro-pill" id="s5-pill-2">ZERO TELEMETRY</div>
+            <div class="outro-pill" id="s5-pill-3">NON-ROOT RECOVERY</div>
+          </div>
+          <div class="outro-url" id="s5-url">github.com/CodeSorcerer-007/Archeion</div>
+        </div>
+      </div>
+
+      <!-- Audio Track -->
+      <audio id="bgm" src="assets/music/track.mp3" data-start="0" data-duration="20" data-track-index="1"></audio>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      // Scene 1: 0.0s -> 3.5s (Starts visible at frame 0)
+      tl.fromTo("#s1-content", 
+        { opacity: 1, y: 0, scale: 1 }, 
+        { opacity: 1, y: 0, scale: 1.02, duration: 3.0, ease: "none" }, 
+        0
+      );
+      tl.to("#s1-content", 
+        { opacity: 0, y: -20, duration: 0.4, ease: "power2.in" }, 
+        3.1
+      );
+
+      // Scene 2: 3.5s -> 7.5s
+      tl.fromTo("#s2-content", 
+        { opacity: 0, y: 30 }, 
+        { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 
+        3.5
+      );
+      tl.fromTo("#card-1", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 3.8);
+      tl.fromTo("#card-2", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 4.1);
+      tl.fromTo("#card-3", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 4.4);
+      tl.fromTo("#card-4", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 4.7);
+      tl.fromTo("#s2-banner", { opacity: 0, scale: 0.95 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.4)" }, 5.0);
+      tl.to("#s2-content", { opacity: 0, y: -20, duration: 0.4, ease: "power2.in" }, 7.1);
+
+      // Scene 3: 7.5s -> 12.0s
+      tl.fromTo("#s3-content", 
+        { opacity: 0, scale: 0.96 }, 
+        { opacity: 1, scale: 1, duration: 0.6, ease: "power3.out" }, 
+        7.5
+      );
+      tl.fromTo("#s3-progress", 
+        { width: "0%" }, 
+        { width: "100%", duration: 3.2, ease: "power1.inOut" }, 
+        8.0
+      );
+      tl.to("#s3-content", { opacity: 0, y: -20, duration: 0.4, ease: "power2.in" }, 11.6);
+
+      // Scene 4: 12.0s -> 16.5s
+      tl.fromTo("#s4-content", 
+        { opacity: 0, y: 30 }, 
+        { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 
+        12.0
+      );
+      tl.fromTo("#s4-badge", 
+        { opacity: 0, scale: 0.8 }, 
+        { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.6)" }, 
+        13.0
+      );
+      tl.to("#s4-content", { opacity: 0, y: -20, duration: 0.4, ease: "power2.in" }, 16.1);
+
+      // Scene 5: 16.5s -> 20.0s
+      tl.fromTo("#s5-content", 
+        { opacity: 0, scale: 0.92 }, 
+        { opacity: 1, scale: 1, duration: 0.6, ease: "power3.out" }, 
+        16.5
+      );
+      tl.fromTo("#s5-pill-1", { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.3 }, 16.8);
+      tl.fromTo("#s5-pill-2", { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.3 }, 17.0);
+      tl.fromTo("#s5-pill-3", { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.3 }, 17.2);
+      tl.fromTo("#s5-url", 
+        { opacity: 0, scale: 0.9 }, 
+        { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.5)" }, 
+        17.3
+      );
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

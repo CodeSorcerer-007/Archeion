@@ -1,5 +1,9 @@
 # ARCHEION — Personal Android Backup, Preservation & Recovery System
 
+<p align="center">
+  <img src="assets/archeion.gif" alt="ARCHEION 20s Sovereign Showcase" width="100%" />
+</p>
+
 ARCHEION is a free, local-first, private Windows application and native Android companion designed to preserve, verify, explore, and restore your Android data without cloud lock-in, subscriptions, or root requirements.
 
 ## Key Features

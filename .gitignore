@@ -38,6 +38,10 @@ captures/
 .externalNativeBuild/
 .cxx/
 
+## Node & Hyperframes
+node_modules/
+.hyperframes/
+
 ## OS-specific
 Thumbs.db
 Desktop.ini

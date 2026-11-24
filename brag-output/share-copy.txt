@@ -1,0 +1,2 @@
+Stop renting your own memories. ARCHEION is sovereign, offline-first personal Android data preservation with zero cloud, authenticated encryption, and bit-exact recovery.
+https://github.com/CodeSorcerer-007/Archeion
